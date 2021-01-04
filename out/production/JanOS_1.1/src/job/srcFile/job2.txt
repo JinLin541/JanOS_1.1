@@ -1,0 +1,25 @@
+priority 12
+MAX
+M 12
+N 13
+MAX_FIN
+function
+request M 12
+LOAD 1 R2
+STORE 2 R1
+LOAD 2 R2
+request N 11
+LOAD 3 R1
+finished
+function
+LOAD 1 R1
+LOAD 2 R2
+LOAD 3 R2
+finished
+data
+1
+2
+3
+4
+5
+finished
