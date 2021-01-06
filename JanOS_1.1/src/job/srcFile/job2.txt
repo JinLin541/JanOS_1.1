@@ -4,6 +4,10 @@ M 12
 N 13
 MAX_FIN
 function
+goto 1
+goto 2
+finished
+function
 request M 12
 LOAD 1 R2
 STORE 2 R1

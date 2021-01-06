@@ -18,47 +18,54 @@ public class Processor {
      */
     public static void ADD(Register r1,Register r2){
         //把r1和r2相加的值存入r1
-//        System.out.println(r1.getName()+"  add  "+r2.getName());
+        System.out.println(r1.getName()+"  add  "+r2.getName());
         Core.usingTime(15);
         r1.setData(r1.getData()+r2.getData());
     }
     public static void LOAD(int data, Register register) throws InterruptedException {
         register.setData(data);
         Core.usingTime(10);
-//        System.out.println("executing LOAD");
+        System.out.println("executing LOAD");
         System.out.println("put "+data+" into  "+register.getName());
-        Thread.sleep(500);
+//        Thread.sleep(500);
     }
     public static int STORE(Register r) throws InterruptedException {
         Core.usingTime(10);
-//        System.out.println("executing STORE");
+        System.out.println("executing STORE");
 //        Thread.sleep(500);
         return r.getData();
     }
     public static String visitReadMemory(int location) throws InterruptedException {
         Core.usingTime(30);
-//        System.out.println("reading Memory");
-        Thread.sleep(500);
+        System.out.println("reading Memory  "+location);
+//        Thread.sleep(500);
         return Memory.read(location);
     }
     public static int changeLocation(int releventLocation,Register r) throws InterruptedException {
         Core.usingTime(10);
-//        System.out.println("changing location used register "+r.getName());
-//        Thread.sleep(500);
+        System.out.println("changing location used register "+r.getName());
+//        Thread.sleep(200);
         return releventLocation+r.getData();
     }
     public static void visitWriteMemory(int data,int location) throws InterruptedException, IOException {
         Core.usingTime(30);
         Memory.write(location,data);
-//        System.out.println("writing Memory");
+        System.out.println("writing Memory  "+location+"  "+"data"+data);
 //        Thread.sleep(500);
     }
-    public static String bankerAlgorithms(PCB pcb, String resourceName, int requestValue){
+    public static String bankerAlgorithms(PCB pcb, String resourceName, int requestValue) throws InterruptedException {
         Core.usingTime(30);
+//        Thread.sleep(500);
         System.out.println("request"+" "+resourceName+" "+requestValue);
         String sequence = Core.AskBanker(pcb,resourceName,requestValue);
         System.out.println("Security sequence "+sequence);
         return sequence;
+    }
+    public static void removeContentFromMemory(int location,int size) throws InterruptedException, IOException {
+        Core.usingTime(30);
+//        Thread.sleep(500);
+        Memory.unitMemory(location,size);
+
     }
 
 

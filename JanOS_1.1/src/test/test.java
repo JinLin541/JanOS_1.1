@@ -43,7 +43,9 @@ public class test {
     }
     @Test
     public void test3() throws FileNotFoundException {
-        setAvailable(1,2);
+        for(int i = 0;i<0;i++){
+            System.out.println("kkk");
+        }
     }
     @Test
     public void test2() throws IOException {

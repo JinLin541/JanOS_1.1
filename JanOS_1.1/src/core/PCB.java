@@ -1,6 +1,8 @@
 package core;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import job.Job;
+import memory.Memory;
 import memory.Page;
 
 import java.io.FileNotFoundException;
@@ -11,6 +13,8 @@ public class PCB{
     private int pageNumber;
     //当前读取的段号
     private int readingPageNumber;
+    //main方法的位移
+    private int mainS;
     //当前段内位移
     private int pageS;
     //当前页的大小
@@ -25,7 +29,44 @@ public class PCB{
     private Map<String,Integer> allocationMap = new LinkedHashMap<>();
     //预分配的temperList
     private Map<String,Integer> temperOriginMap;
+    //clock置换算法
+    private Map<Integer, Boolean> recordPageMap = new LinkedHashMap<>();
 
+    public PCB(int pageInitLocation, int pageNumber) {
+        //把readingPageNumber初始化为0
+        this.readingPageNumber = 0;
+        this.pageInitLocation = pageInitLocation;
+        //有一段是数据
+        this.pageNumber = pageNumber-1;
+        //初始化recordPageMap
+        //因为不希望数据区被替换掉，所以pageNumber要减一
+//        for(int i = 0; i < this.pageNumber;i++){
+//            //初始化全部未被访问
+//            recordPageMap.put(i,false);
+//        }
+        for(int i = 0;i<this.pageNumber;i++){
+            String content = Memory.read(pageInitLocation+i);
+            String loadInfo = content.split(" ")[2];
+            if(loadInfo.equals("load")){
+                recordPageMap.put(i,false);
+            }
+        }
+
+    }
+
+    public void updateRecordMap(){
+        for(int i = 0;i<pageNumber;i++){
+            String content = Memory.read(pageInitLocation+i);
+            String loadInfo = content.split(" ")[2];
+            if(loadInfo.equals("load")){
+                recordPageMap.put(i,false);
+            }
+        }
+    }
+
+    public Map<Integer, Boolean> getRecordPageMap() {
+        return recordPageMap;
+    }
 
     public void addElementToAllocation(Map<String,Integer> map1){
         allocationMap.putAll(map1);
@@ -124,11 +165,7 @@ public class PCB{
         this.pageSize = pageSize;
     }
 
-    public PCB(int pageInitLocation, int pageNumber) {
-        this.pageInitLocation = pageInitLocation;
-        //有一段是数据
-        this.pageNumber = pageNumber-1;
-    }
+
 
     public int getPageInitLocation() {
         return pageInitLocation;
@@ -136,6 +173,14 @@ public class PCB{
 
     public void setPageInitLocation(int pageInitLocation) {
         this.pageInitLocation = pageInitLocation;
+    }
+
+    public int getMainS() {
+        return mainS;
+    }
+
+    public void setMainS(int mainS) {
+        this.mainS = mainS;
     }
 
     @Override

@@ -50,13 +50,26 @@ public class Memory{
                 flag = x.getInitLocation();
                 x.setInitLocation(x.getInitLocation()+requestSize);
                 x.setSize(xSize-requestSize);
-
                 break;
             }
         }
         write();
         return flag;
     }
+
+    public static void update(int location,String content) throws IOException {
+        info[location] = content;
+        write();
+    }
+    public static void updateWithoutSize(int location,String blockLocation) throws IOException {
+        String size =info[location].split(" ")[1];
+        update(location,blockLocation+" "+size+" load");
+    }
+    public static void updateWithoutSizeForUnload(int location,String blockLocation) throws IOException {
+        String size =info[location].split(" ")[1];
+        update(location,blockLocation+" "+size+" unload");
+    }
+
     public static void unitMemory(int initLocation,int size) throws IOException {
         //从String数组里面删除内容
         for(int i = initLocation;i<size+initLocation;i++){

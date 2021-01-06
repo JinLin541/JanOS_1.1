@@ -4,6 +4,8 @@ import attemper.Attemper;
 import com.sun.scenario.effect.impl.state.LinearConvolveKernel;
 import edu.princeton.cs.algs4.In;
 import job.Job;
+import memory.Memory;
+import memory.Page;
 import memory.register.CommandR1;
 import memory.register.R1;
 import memory.register.Register;
@@ -84,7 +86,10 @@ public class Core {
         boolean blokenFlag = false;
         boolean killFlag = false;
        while(true){
-           Time = 800+Time;
+           if(Time < 0){
+               Time = 0;
+           }
+           Time = 5000+Time;
 //           if(usedTime != 0){
 //               //使用完上一个时间片的剩余时间，要置零
 //               usedTime = 0;
@@ -102,14 +107,14 @@ public class Core {
            }
            System.out.println(runPcb.getName()+"  start work");
            while(getTime() > 0){
-               if(runPcb.getPageS() == 0 && runPcb.getReadingPageNumber() == 0){
+               if(runPcb.getPageS() == 0){
                    //说明还没有保存段的大小在pcb中，设置pcb中的当前段大小
                    setPCBPageSize(runPcb,runPcb.getReadingPageNumber());
                }
-               if(runPcb.getPageS() == runPcb.getPageSize()){
+               if(runPcb.getPageS() == runPcb.getPageSize() || runPcb.getPageS() > runPcb.getPageSize()){
                    //说明已经读完了当前段的最后一句
-                   if(runPcb.getPageNumber() == runPcb.getReadingPageNumber()+1){
-                       //如果是最后一页，作业结束，杀死进程
+                   if(runPcb.getReadingPageNumber() == 0){
+                       //如果是main最后一页，作业结束，杀死进程
                        Attemper.killProcess(runPcb);
                        System.out.println("killed  "+runPcb.getName());
                        killFlag = true;
@@ -118,40 +123,105 @@ public class Core {
                        break;
                    }else{
                        //否则就重新访问内存，读取段表，获取下一段的大小保存到pcb
-                       setPCBPageSize(runPcb,runPcb.getReadingPageNumber()+1);
-                       //把页内位移置为0，reading也要变
-                       runPcb.setPageS(0);
-                       runPcb.setReadingPageNumber(runPcb.getReadingPageNumber()+1);
+//                       setPCBPageSize(runPcb,runPcb.getReadingPageNumber()+1);
+//                       //把页内位移置为0，reading也要变
+//                       runPcb.setPageS(0);
+//                       runPcb.setReadingPageNumber(runPcb.getReadingPageNumber()+1);
+                       //访问过了就把相应的段的访问位置为true
+                       runPcb.setReadingPageNumber(0);
+                       runPcb.setPageS(runPcb.getMainS());
+                       setPCBPageSize(runPcb,runPcb.getReadingPageNumber());
+                       if(runPcb.getPageNumber() == 0) {
+                           //如果是main最后一页，作业结束，杀死进程
+                           Attemper.killProcess(runPcb);
+                           System.out.println("killed  " + runPcb.getName());
+                           killFlag = true;
+                           //同时跳出该时间片
+//                       usedTime = 200-Time;
+                           break;
+                       }
                    }
                }
               //先把段的相对地址转化为内存中的绝对地址,读取两次内存
                //段表的初始地址加上段号，找到段的初始地址，再加上段页内位移，找到目的语句的物理地址
                String buff = Processor.visitReadMemory(runPcb.getPageInitLocation()+runPcb.getReadingPageNumber());
+
                String[] buff2 = buff.split(" ");
-               int pageInitLocation = Integer.parseInt(buff2[0]);
-               int location = pageInitLocation + runPcb.getPageS();
-               //获取语句
-               String command = Processor.visitReadMemory(location);
-               String[] buff3 = command.split(" ");
-               switch(buff3[0]){
-                   case "LOAD" :
-                       int data = visitData(runPcb,Integer.parseInt(buff3[1]));
-                       Processor.LOAD(data, Utils.lookingRegisterForString(buff3[2]));
-                       break;
-                   case "STORE":
-                       writeData(runPcb,Integer.parseInt(buff3[1]),buff3[2]);
-                       break;
-                   case "request":
-                       String sequence = Processor.bankerAlgorithms(runPcb,buff3[1],Integer.parseInt(buff3[2]));
-                       if(sequence == null){
-                           //堵塞进程
-                           blokenFlag = true;
+               //先判断有没有缺页
+               if(Integer.parseInt(buff2[0]) == -1){
+                   //执行中断，调入缺少的页
+                   //寻找可以进行置换的页
+                   //使用clock算法
+                   boolean finishChoose = false;
+                   int choseKey = 0;
+                   while(true){
+                       for(Integer key : runPcb.getRecordPageMap().keySet()){
+                           if(runPcb.getRecordPageMap().get(key)){
+                               //如果最近有访问，就置为false
+                               runPcb.getRecordPageMap().put(key,false);
+                           }else{
+                               System.out.println("removing page "+key);
+                               int location = Integer.parseInt(getLocationFromPageList(runPcb.getPageInitLocation(),key));
+                               Processor.removeContentFromMemory(location,Integer.parseInt(getSizeFromPageList(runPcb.getPageInitLocation(),key)));
+                                finishChoose = true;
+                                Memory.updateWithoutSizeForUnload(runPcb.getPageInitLocation()+key,
+                                        String.valueOf(-1));
+                                choseKey = key;
+                           }
                        }
-                       break;
-                   default:
-                       //读不到语句，把进程堵塞
-                       blokenFlag = true;
-                       break;
+                       if(finishChoose){
+                           runPcb.getRecordPageMap().remove(choseKey);
+                           break;
+                       }
+                   }
+                   int currentLocation = Memory.requestMemory(job.getPageLinkedList().get(runPcb.getReadingPageNumber()),runPcb.getPageSize());
+                   Memory.updateWithoutSize(runPcb.getPageInitLocation()+runPcb.getReadingPageNumber(),String.valueOf(currentLocation));
+                   System.out.println("adding page "+runPcb.getReadingPageNumber());
+                   runPcb.getRecordPageMap().put(runPcb.getReadingPageNumber(),false);
+               }else{
+                   int pageInitLocation = Integer.parseInt(buff2[0]);
+                   int location = pageInitLocation + runPcb.getPageS();
+                   //获取语句
+                   String command = Processor.visitReadMemory(location);
+                   String[] buff3 = command.split(" ");
+                   switch(buff3[0]){
+                       case "LOAD" :
+                           int data = visitData(runPcb,Integer.parseInt(buff3[1]));
+                           Processor.LOAD(data, Utils.lookingRegisterForString(buff3[2]));
+                           runPcb.getRecordPageMap().put(runPcb.getReadingPageNumber(),true);
+                           if(runPcb.getReadingPageNumber() == 0){
+                               runPcb.setMainS(runPcb.getMainS()+1);
+                           }
+                           break;
+                       case "STORE":
+                           writeData(runPcb,Integer.parseInt(buff3[1]),buff3[2]);
+                           runPcb.getRecordPageMap().put(runPcb.getReadingPageNumber(),true);
+                           if(runPcb.getReadingPageNumber() == 0){
+                               runPcb.setMainS(runPcb.getMainS()+1);
+                           }
+                           break;
+                       case "request":
+                           String sequence = Processor.bankerAlgorithms(runPcb,buff3[1],Integer.parseInt(buff3[2]));
+                           runPcb.getRecordPageMap().put(runPcb.getReadingPageNumber(),true);
+                           if(sequence == null){
+                               //堵塞进程
+                               blokenFlag = true;
+                           }
+                           if(runPcb.getReadingPageNumber() == 0){
+                               runPcb.setMainS(runPcb.getMainS()+1);
+                           }
+                           break;
+                       case "goto":
+                           runPcb.setPageS(-1);
+                           runPcb.setReadingPageNumber(Integer.parseInt(buff3[1]));
+                           runPcb.setMainS(runPcb.getMainS()+1);
+                           setPCBPageSize(runPcb,runPcb.getReadingPageNumber());
+                           break;
+                       default:
+                           //读不到语句，把进程堵塞
+                           blokenFlag = true;
+                           break;
+                   }
                }
                if(blokenFlag){
                    //如果进程发生堵塞，就跳出该时间片，并且设置已经用了的时间，以便给下一个一个作业多一点时间
@@ -181,7 +251,15 @@ public class Core {
     }
 
 
+    public static String getLocationFromPageList(int pageLocation,int i) throws InterruptedException {
+        String buff = Processor.visitReadMemory(pageLocation+i);
+        return buff.split(" ")[0];
+    }
 
+    public static String getSizeFromPageList(int pageLocation,int i) throws InterruptedException {
+        String buff = Processor.visitReadMemory(pageLocation+i);
+        return buff.split(" ")[1];
+    }
 
 
     public static void writeData(PCB pcb,int dataDestination,String register) throws InterruptedException, IOException {
