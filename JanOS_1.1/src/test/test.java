@@ -8,9 +8,6 @@ import job.Job;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Scanner;
 
 public class test {
     @Test
@@ -18,8 +15,8 @@ public class test {
         Core core = new Core();
         Core.setResourcesName("M","N","Q");
         Core.setAvailable(20,20,19);
-        Job job = new Job("./src/job/srcFile/job2.txt");
-        Job job2 = new Job("./src/job/srcFile/job2.txt");
+        Job job = new Job("job/classFile/job2class.txt");
+        Job job2 = new Job("job/classFile/job2class.txt");
         job.setName("A");
         job2.setName("B");
         Attemper.addJob(job);

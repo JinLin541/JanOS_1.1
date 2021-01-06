@@ -73,8 +73,8 @@ public class Core {
         Core core = new Core();
         setResourcesName("M","N","Q");
         setAvailable(20,20,19);
-        Job job = new Job("JanOS_1.1/src/job/srcFile/job2.txt");
-        Job job2 = new Job("JanOS_1.1/src/job/srcFile/job2.txt");
+        Job job = new Job("JanOS_1.1/src/job/classFile/job2class.txt");
+        Job job2 = new Job("JanOS_1.1/src/job/classFile/job2class.txt");
         job.setName("A");
         job2.setName("B");
         Attemper.addJob(job);
@@ -89,7 +89,7 @@ public class Core {
            if(Time < 0){
                Time = 0;
            }
-           Time = 5000+Time;
+           Time = 300+Time;
 //           if(usedTime != 0){
 //               //使用完上一个时间片的剩余时间，要置零
 //               usedTime = 0;
@@ -276,7 +276,7 @@ public class Core {
 //        Core core = new Core();
 //        String command;
 //        Job job = new Job("JanOS_1.1/src/job/srcFile/job1.txt");
-//        Job job2 = new Job("JanOS_1.1/src/job/srcFile/job2.txt");
+//        Job job2 = new Job("JanOS_1.1/src/job/srcFile/job2class.txt");
 //        Attemper.addPCB(new PCB(job));
 //        Attemper.addPCB(new PCB(job2));
 //        int usedTime = 0;

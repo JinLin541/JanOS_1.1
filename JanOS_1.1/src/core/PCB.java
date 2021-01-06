@@ -10,6 +10,8 @@ import java.util.*;
 
 public class PCB{
     private int pageInitLocation;
+    private static int countCreateNumber = 0;
+    private int UID;
     private int pageNumber;
     //当前读取的段号
     private int readingPageNumber;
@@ -33,6 +35,8 @@ public class PCB{
     private Map<Integer, Boolean> recordPageMap = new LinkedHashMap<>();
 
     public PCB(int pageInitLocation, int pageNumber) {
+        countCreateNumber++;
+        UID = countCreateNumber;
         //把readingPageNumber初始化为0
         this.readingPageNumber = 0;
         this.pageInitLocation = pageInitLocation;
@@ -52,6 +56,14 @@ public class PCB{
             }
         }
 
+    }
+
+    public int getUID() {
+        return UID;
+    }
+
+    public void setUID(int UID) {
+        this.UID = UID;
     }
 
     public void updateRecordMap(){

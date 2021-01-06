@@ -1,0 +1,15 @@
+#  config{
+    priority 12
+}
+main(){
+    a();
+    b();
+}
+function a(){
+    int x = 1;
+    request M 12;
+}
+function b(){
+    float x = 2;
+    request N 13;
+}

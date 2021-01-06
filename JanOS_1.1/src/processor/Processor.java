@@ -27,35 +27,36 @@ public class Processor {
         Core.usingTime(10);
         System.out.println("executing LOAD");
         System.out.println("put "+data+" into  "+register.getName());
-//        Thread.sleep(500);
+        Thread.sleep(500);
     }
     public static int STORE(Register r) throws InterruptedException {
         Core.usingTime(10);
-        System.out.println("executing STORE");
-//        Thread.sleep(500);
+        System.out.println("executing STORE....");
+        Thread.sleep(500);
         return r.getData();
     }
     public static String visitReadMemory(int location) throws InterruptedException {
         Core.usingTime(30);
         System.out.println("reading Memory  "+location);
-//        Thread.sleep(500);
+        Thread.sleep(1000);
         return Memory.read(location);
     }
     public static int changeLocation(int releventLocation,Register r) throws InterruptedException {
         Core.usingTime(10);
         System.out.println("changing location used register "+r.getName());
-//        Thread.sleep(200);
+        Thread.sleep(200);
         return releventLocation+r.getData();
     }
     public static void visitWriteMemory(int data,int location) throws InterruptedException, IOException {
         Core.usingTime(30);
         Memory.write(location,data);
         System.out.println("writing Memory  "+location+"  "+"data"+data);
-//        Thread.sleep(500);
+        Thread.sleep(1000);
     }
     public static String bankerAlgorithms(PCB pcb, String resourceName, int requestValue) throws InterruptedException {
         Core.usingTime(30);
-//        Thread.sleep(500);
+        System.out.println("executing the bankerAlgorithms.....");
+        Thread.sleep(1500);
         System.out.println("request"+" "+resourceName+" "+requestValue);
         String sequence = Core.AskBanker(pcb,resourceName,requestValue);
         System.out.println("Security sequence "+sequence);
@@ -63,7 +64,8 @@ public class Processor {
     }
     public static void removeContentFromMemory(int location,int size) throws InterruptedException, IOException {
         Core.usingTime(30);
-//        Thread.sleep(500);
+        System.out.println("Removing");
+        Thread.sleep(500);
         Memory.unitMemory(location,size);
 
     }

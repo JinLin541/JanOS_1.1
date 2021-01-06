@@ -216,8 +216,8 @@ public class Attemper {
     }
 
     public static void main(String[] args) throws IOException {
-//        Job job = new Job("JanOS_1.1/src/job/srcFile/job2.txt");
-//        Job job2 = new Job("JanOS_1.1/src/job/srcFile/job2.txt");
+//        Job job = new Job("JanOS_1.1/src/job/srcFile/job2class.txt");
+//        Job job2 = new Job("JanOS_1.1/src/job/srcFile/job2class.txt");
 //        addJob(job);
 //        addJob(job2);
 //        submitJob();
