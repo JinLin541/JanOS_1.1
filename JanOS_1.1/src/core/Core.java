@@ -1,8 +1,6 @@
 package core;
 
 import attemper.Attemper;
-import com.sun.scenario.effect.impl.state.LinearConvolveKernel;
-import edu.princeton.cs.algs4.In;
 import job.Job;
 import memory.Memory;
 import memory.Page;
@@ -200,6 +198,11 @@ public class Core {
                                runPcb.setMainS(runPcb.getMainS()+1);
                            }
                            break;
+                       case "ADD":
+                           String R1 = buff3[1];
+                           String R2 = buff3[2];
+                           Processor.ADD(Utils.lookingRegisterForString(R1),Utils.lookingRegisterForString(R2));
+                           break;
                        case "request":
                            String sequence = Processor.bankerAlgorithms(runPcb,buff3[1],Integer.parseInt(buff3[2]));
                            runPcb.getRecordPageMap().put(runPcb.getReadingPageNumber(),true);
@@ -215,7 +218,7 @@ public class Core {
                            runPcb.setPageS(-1);
                            runPcb.setReadingPageNumber(Integer.parseInt(buff3[1]));
                            runPcb.setMainS(runPcb.getMainS()+1);
-                           setPCBPageSize(runPcb,runPcb.getReadingPageNumber());
+//                           setPCBPageSize(runPcb,runPcb.getReadingPageNumber());
                            break;
                        default:
                            //读不到语句，把进程堵塞
@@ -227,6 +230,7 @@ public class Core {
                    //如果进程发生堵塞，就跳出该时间片，并且设置已经用了的时间，以便给下一个一个作业多一点时间
 //                   usedTime = 200-Time;
                    System.out.println("bloken  "+runPcb.getName());
+                   Attemper.block(runPcb);
                    break;
                }
                runPcb.setPageS(runPcb.getPageS()+1);

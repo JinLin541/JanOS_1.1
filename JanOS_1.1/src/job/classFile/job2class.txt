@@ -8,22 +8,24 @@ goto 1
 goto 2
 finished
 function
-request M 12
+LOAD 0 R1
 LOAD 1 R2
+ADD R1 R2
 STORE 2 R1
-LOAD 2 R2
-request N 11
-LOAD 3 R1
+request M 12
 finished
 function
-LOAD 1 R1
-LOAD 2 R2
-LOAD 3 R2
+LOAD 3 R1
+LOAD 4 R2
+ADD R1 R2
+STORE 5 R1
+request N 13
 finished
 data
 1
 2
+0
 3
 4
-5
+0
 finished

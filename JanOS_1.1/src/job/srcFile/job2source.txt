@@ -1,0 +1,19 @@
+config{
+    priority 12
+}
+function a () {
+    int x = 1;
+    int y = 2;
+    int c = x + y;
+    request M 12;
+}
+function b () {
+    int x = 3;
+    int y = 4;
+    int c = x + y;
+    request N 13;
+}
+main () {
+    a();
+    b();
+}

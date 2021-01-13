@@ -187,10 +187,10 @@ public class Attemper {
         }
     }
     public static PCB nextPCB(){
-        if(blockList.size()!=0){
-            PCB temper = blockList.removeFirst();
-            addPCB(temper);
-        }
+//        if(blockList.size()!=0){
+//            PCB temper = blockList.removeFirst();
+//            addPCB(temper);
+//        }
         if(readyList.size() == 0){
             return null;
         }else{

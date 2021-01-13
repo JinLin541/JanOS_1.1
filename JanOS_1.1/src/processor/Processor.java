@@ -55,9 +55,9 @@ public class Processor {
     }
     public static String bankerAlgorithms(PCB pcb, String resourceName, int requestValue) throws InterruptedException {
         Core.usingTime(30);
+        System.out.println("request"+" "+resourceName+" "+requestValue);
         System.out.println("executing the bankerAlgorithms.....");
         Thread.sleep(1500);
-        System.out.println("request"+" "+resourceName+" "+requestValue);
         String sequence = Core.AskBanker(pcb,resourceName,requestValue);
         System.out.println("Security sequence "+sequence);
         return sequence;
